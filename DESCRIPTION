@@ -9,7 +9,6 @@ Maintainer: Yue Pan <yuep027@gmail.com>
 Description: A tool for cell-type-specific (cs) QTL that can be applied to proteomics (pQTL) and 
     gene expression (eQTL) to study the genetic variants that are associated with 
     gene expression at the protein or mRNA level. 
-
 License: MIT + file LICENSE
 Encoding: UTF-8
 Suggests: 
@@ -24,3 +23,4 @@ Imports:
 RdMacros: Rdpack
 Depends: 
     R (>= 2.10)
+RoxygenNote: 7.2.1

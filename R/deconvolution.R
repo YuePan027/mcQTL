@@ -8,6 +8,7 @@
 #' @param method A character string denotes which deconvolution method to use. In thi current version, only `CIBERSORT` or `nnls` is supported.
 #'
 #' @return A `SummarizedExperiment` with the cell-type proportion estimates for each sample stored in metadata slot.
+#' @export
 #'
 #' @examples
 #'
