@@ -1,11 +1,26 @@
 Package: pQTL
-Type: Package
+Type: Cell-type-specific Quantitative Trait Loci (QTL)
 Title: What the Package Does (Title Case)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Authors@R: c(
+    person("Yue", "Pan", email = "yuep027@gmail.com", role = c("aut", "cre")),
+    person("Qian", "Li", email = "Qian.Li@STJUDE.ORG", role = c("aut"))
+Maintainer: Yue Pan <yuep027@gmail.com>
+Description: A tool for cell-type-specific (cs) QTL that can be applied to proteomics (pQTL) and 
+    gene expression (eQTL) to study the genetic variants that are associated with 
+    gene expression at the protein or mRNA level. 
+
+License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
+Suggests: 
+    testthat (>= 3.0.0),
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Imports: 
+    SummarizedExperiment,
+    matrixStats
+RdMacros: Rdpack
+Depends: 
+    R (>= 2.10)
