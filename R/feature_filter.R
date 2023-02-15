@@ -1,6 +1,6 @@
 #' Estimation of cellular composition in high-throughput data from heterogeneous tissues
 #'
-#' This function returns a `SummarizedExperiment` object including cell-type proportion estimates for each sample.
+#' This function returns a `SummarizedExperiment` object including SNPs used to test for each protein in downstream analysis.
 #'
 #' This is a function developed to implement cell-type proportion deconvolution using either `CIBERSORT` or `nnls`.
 #'
@@ -35,10 +35,10 @@
 #'
 #' se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data), rowData = pQTL::anno_protein)
 #' metadata(se) <- list(SNP_data = pQTL::SNP_data, anno_SNP = pQTL::anno_SNP)
-#' se <- filter(se, filter_method = c("allele", "distance"), filter_allele = 0.25)
+#' se <- feature_filter(se, filter_method = c("allele", "distance"), filter_allele = 0.25)
 #'
 #'
-filter <- function(se,
+feature_filter <- function(se,
                    target_protein = NULL,
                    target_SNP = NULL,
                    filter_method = c("allele", "distance", "null"),
