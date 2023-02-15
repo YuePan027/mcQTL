@@ -4,15 +4,17 @@
 #'
 #' This is a function developed to implement cell-type proportion deconvolution using either `CIBERSORT` or `nnls`.
 #'
-#' @param se A `SummarizedExperiment` object.
-#' @param method A character string denotes which deconvolution method to use. In thi current version, only `CIBERSORT` or `nnls` is supported.
+#' @param se A `SummarizedExperiment` object with bulk protein/gene expression contained in `counts` slot, and
+#' a "signature matrix" which serves as a reference of known cellular signatures contained as an element in `metadata` slot.
+#' @param method A character string denotes which deconvolution method to use. In this current version, only `CIBERSORT` or `nnls` is supported.
 #'
-#' @return A `SummarizedExperiment` with the cell-type proportion estimates for each sample stored in metadata slot.
+#' @return A `SummarizedExperiment`. The cell-type proportion estimates for each sample will be stored as an element (`prop`) in `metadata` slot.
 #' @export
 #'
 #' @examples
 #'
 #' se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data), rowData = pQTL::anno_protein)
+#' metadata(se) <- list(sig_matrix = pQTL::ref_data)
 #' se <- deconv(se, "cibersort")
 #'
 #'
