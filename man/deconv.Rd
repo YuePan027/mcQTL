@@ -4,13 +4,15 @@
 \alias{deconv}
 \title{Estimation of cellular composition in high-throughput data from heterogeneous tissues}
 \usage{
-deconv(se, method = c("cibersort", "nnls"))
+deconv(se, method = c("cibersort", "nnls"), TCA_update = FALSE)
 }
 \arguments{
 \item{se}{A `SummarizedExperiment` object with bulk protein/gene expression contained in `counts` slot, and
 a "signature matrix" which serves as a reference of known cellular signatures contained as an element in `metadata` slot.}
 
 \item{method}{A character string denotes which deconvolution method to use. In this current version, only `CIBERSORT` or `nnls` is supported.}
+
+\item{TCA_update}{A logical value indicating whether to use TCA model to re-estimate the cell composition from last step.}
 }
 \value{
 A `SummarizedExperiment`. The cell-type proportion estimates for each sample will be stored as an element (`prop`) in `metadata` slot.
@@ -23,9 +25,11 @@ This is a function developed to implement cell-type proportion deconvolution usi
 }
 \examples{
 
-se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data), rowData = pQTL::anno_protein)
+se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
+                           rowData = pQTL::anno_protein)
 metadata(se) <- list(sig_matrix = pQTL::ref_data)
 se <- deconv(se, "cibersort")
+head(se@metadata$prop)
 
 
 }

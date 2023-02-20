@@ -31,10 +31,13 @@
 #'
 #' @export
 #'
+#'
 #' @examples
 #'
-#' se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data), rowData = pQTL::anno_protein)
+#' se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
+#'                            rowData = pQTL::anno_protein)
 #' metadata(se) <- list(SNP_data = pQTL::SNP_data, anno_SNP = pQTL::anno_SNP)
+#' target_protein <- c("NUDT2", "GALT")
 #' se <- feature_filter(se, filter_method = c("allele", "distance"), filter_allele = 0.25)
 #'
 #'
@@ -48,7 +51,7 @@ feature_filter <- function(se,
     stop("Samples in protein_data do not match that in SNP_data")
   }
 
-  if (!nrow(metadata(se)$SNP_data) == norw(metadata(se)$anno_SNP)){
+  if (!nrow(metadata(se)$SNP_data) == nrow(metadata(se)$anno_SNP)){
     stop("SNPs contained in annotation data frame `anno_SNP` must match the SNPs in `SNP_data`")
   }
 

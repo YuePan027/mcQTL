@@ -51,8 +51,10 @@ This is a function developed to implement cell-type proportion deconvolution usi
 }
 \examples{
 
-se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data), rowData = pQTL::anno_protein)
+se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
+                           rowData = pQTL::anno_protein)
 metadata(se) <- list(SNP_data = pQTL::SNP_data, anno_SNP = pQTL::anno_SNP)
+target_protein <- c("NUDT2", "GALT")
 se <- feature_filter(se, filter_method = c("allele", "distance"), filter_allele = 0.25)
 
 
