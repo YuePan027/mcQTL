@@ -2,7 +2,7 @@
 #'
 #' This function returns a `SummarizedExperiment` object including csDE proteins based on samples' genotype.
 #'
-#' This is a function developed to implement cell-type-specific differential expression using either `TOAST`.
+#' This is a function developed to implement cell-type-specific differential expression using `TOAST`.
 #'
 #' @param se A `SummarizedExperiment` object with bulk protein/gene expression contained in `counts` slot.
 #' The information from genetic variants should be stored in a P (the number of SNP) by N (the number of samples, should match the sample in `counts` slot) matrix contained as an element (`SNP_data`) in `metadata` slot.
