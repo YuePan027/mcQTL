@@ -16,6 +16,8 @@ It should include at least the following columns: "CHROM" (which chromosome the 
 The information on cellular composition is required and stored as `prop` in `metadata` slot.
 It is an N (the number of samples, should match the sample in `counts` slot) by K (the number of cell types) matrix.
 This can be obtained by running `deconv()` before any filtering steps, or use any source data directly.}
+
+\item{BPPARAM}{For applying `bplapply`.}
 }
 \value{
 A `SummarizedExperiment`. The csDE results will be stored as an element (`TOAST_output`) in `metadata` slot.

@@ -13,19 +13,24 @@
 #' The information on cellular composition is required and stored as `prop` in `metadata` slot.
 #' It is an N (the number of samples, should match the sample in `counts` slot) by K (the number of cell types) matrix.
 #' This can be obtained by running `deconv()` before any filtering steps, or use any source data directly.
+#' @param BPPARAM For applying `bplapply`.
 #'
 #' @return A `SummarizedExperiment`. The csDE results will be stored as an element (`TOAST_output`) in `metadata` slot.
+#'
+#' @import SummarizedExperiment
+#' @import TOAST
+#' @importFrom BiocParallel bplapply
+#' @importFrom BiocParallel bpparam
+#' @importFrom magrittr "%>%"
+#' @importFrom purrr map
 #' @export
 #'
 #'
-#' @examples
-#'
-#'
-#'
-csDE <- function(se, BPPARAM=bpparam()){
+csDE <- function(se, BPPARAM = bpparam()){
 
   prop <- se@metadata$prop
   protein_tab <- assay(se)
+  SNP <- se@metadata$SNP_data
   SNP_ID <- se@metadata$anno_SNP$ID
 
   Res_TOAST <- lapply(1:length(se@metadata$choose_SNP_list), function(x){

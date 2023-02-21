@@ -1,0 +1,32 @@
+---
+title: "csQTL"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{csQTL}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+abstract: >
+  This is a tool for cell-type-specific quantitative trait loci (csQTL) analysis, which may be used in proteomics (pQTL) or gene expression (eQTL) to investigate the genetic variations linked to gene expression at the protein or mRNA level.
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Install
+
+```{r setup}
+library(pQTL)
+```
+
+
+Cell-type proportion (e.g. CIBERSORT)
+(optional) Sample-wise expression deconvolution (TCA/bMIND)
+csQTL analysis
+TOAST
+(TOAST) + TCA + limma
+Integrative analysis (add gene expression)
+Visualization

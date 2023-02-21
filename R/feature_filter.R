@@ -29,6 +29,8 @@
 #' Each element stores the index of SNPs to be tested for corresponding protein.
 #' The proteins with no SNPs correspond to it will be removed from the returned list.
 #'
+#' @import SummarizedExperiment
+#'
 #' @export
 #'
 #'
@@ -36,9 +38,10 @@
 #'
 #' se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
 #'                            rowData = pQTL::anno_protein)
-#' metadata(se) <- list(SNP_data = pQTL::SNP_data, anno_SNP = pQTL::anno_SNP)
-#' target_protein <- c("NUDT2", "GALT")
-#' se <- feature_filter(se, filter_method = c("allele", "distance"), filter_allele = 0.25)
+#' se@metadata <- list(SNP_data = pQTL::SNP_data, anno_SNP = pQTL::anno_SNP)
+#' se <- feature_filter(se, target_protein = c("Gene_1", "Gene_2"),
+#'                      filter_method = c("allele", "distance"),
+#'                      filter_allele = 0.25)
 #'
 #'
 feature_filter <- function(se,
@@ -47,11 +50,11 @@ feature_filter <- function(se,
                    filter_method = c("allele", "distance", "null"),
                    filter_allele = 0.25){
 
-  if (!all(colnames(assay(se)) == colnames(metadata(se)$SNP_data))){
+  if (!all(colnames(assay(se)) == colnames(se@metadata$SNP_data))){
     stop("Samples in protein_data do not match that in SNP_data")
   }
 
-  if (!nrow(metadata(se)$SNP_data) == nrow(metadata(se)$anno_SNP)){
+  if (!nrow(se@metadata$SNP_data) == nrow(se@metadata$anno_SNP)){
     stop("SNPs contained in annotation data frame `anno_SNP` must match the SNPs in `SNP_data`")
   }
 
@@ -60,26 +63,26 @@ feature_filter <- function(se,
   }
 
   if(!is.null(target_SNP)){
-    metadata(se)$SNP_data <- metadata(se)$SNP_data[match(target_SNP, metadata(se)$anno_SNP$ID), , drop=F]
-    metadata(se)$anno_SNP <- metadata(se)$anno_SNP[match(target_SNP, metadata(se)$anno_SNP$ID), , drop=F]
+    se@metadata$SNP_data <- se@metadata$SNP_data[match(target_SNP, se@metadata$anno_SNP$ID), , drop=F]
+    se@metadata$anno_SNP <- se@metadata$anno_SNP[match(target_SNP, se@metadata$anno_SNP$ID), , drop=F]
   }
 
   res_TOAST <- NULL
   rowData(se) <- rowData(se)[match(rownames(assay(se)), rowData(se)$Symbol),]
-  choose_SNP_list <- rep(list(1:nrow(metadata(se)$SNP_data)), each = nrow(assay(se)))
+  choose_SNP_list <- rep(list(1:nrow(se@metadata$SNP_data)), each = nrow(assay(se)))
 
   if("allele" %in% filter_method){
-    prop <- apply(metadata(se)$SNP_data, 1, prop_allele)
+    prop <- apply(se@metadata$SNP_data, 1, prop_allele)
     idx <- which(prop > filter_allele & prop <= 1 - filter_allele)
-    metadata(se)$SNP_data <- metadata(se)$SNP_data[idx, , drop=F]
-    metadata(se)$anno_SNP <- metadata(se)$anno_SNP[idx, , drop=F]
-    choose_SNP_list <- rep(list(1:nrow(metadata(se)$SNP_data)), each = nrow(assay(se)))
+    se@metadata$SNP_data <- se@metadata$SNP_data[idx, , drop=F]
+    se@metadata$anno_SNP <- se@metadata$anno_SNP[idx, , drop=F]
+    choose_SNP_list <- rep(list(1:nrow(se@metadata$SNP_data)), each = nrow(assay(se)))
   }
   if("distance" %in% filter_method){
     choose_SNP_list <- lapply(1:nrow(assay(se)), function(i){
       df <- rowData(se)[which(rowData(se)$Symbol == rownames(assay(se))[i]),]
-      idx2 <- which((abs(as.numeric(metadata(se)$anno_SNP$POS) - df$Start) < 1000000) &
-                      metadata(se)$anno_SNP$CHROM == df[1,1])
+      idx2 <- which((abs(as.numeric(se@metadata$anno_SNP$POS) - df$Start) < 1000000) &
+                      se@metadata$anno_SNP$CHROM == df[1,1])
       return(idx2)
     })
     names(choose_SNP_list) <- rownames(assay(se))
@@ -88,6 +91,6 @@ feature_filter <- function(se,
     choose_SNP_list <- choose_SNP_list[idx3]
   }
 
-  metadata(se)$choose_SNP_list <- choose_SNP_list
+  se@metadata$choose_SNP_list <- choose_SNP_list
   return(se)
 }

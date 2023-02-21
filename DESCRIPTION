@@ -24,7 +24,10 @@ Imports:
     preprocessCore,
     tidyverse,
     tibble,
-    dplyr
+    purrr,
+    TOAST,
+    magrittr,
+    BiocParallel
 Depends: 
     R (>= 3.0),
     SummarizedExperiment

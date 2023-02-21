@@ -10,6 +10,10 @@
 #' @param TCA_update A logical value indicating whether to use TCA model to re-estimate the cell composition from last step.
 #'
 #' @return A `SummarizedExperiment`. The cell-type proportion estimates for each sample will be stored as an element (`prop`) in `metadata` slot.
+#'
+#' @import SummarizedExperiment
+#' @importFrom magrittr "%>%"
+#'
 #' @export
 #'
 #'
