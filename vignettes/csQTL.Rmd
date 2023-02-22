@@ -1,72 +1,59 @@
 ---
-title: "csQTL"
-output: rmarkdown::html_vignette
+title: "mcQTL"
+output: rmarkdown::html_vignette #Check if we need to use BiocStyle instead of rmarkdown when submit to Bioconductor 
 vignette: >
-  %\VignetteIndexEntry{csQTL}
+  %\VignetteIndexEntry{mcsQTL}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 abstract: >
-  This is a tool for cell-type-specific quantitative trait loci (csQTL) analysis, which may be used in proteomics (pQTL) or gene expression (eQTL) to investigate the genetic variations linked to gene expression at the protein or mRNA level.
+  This is a tool for multi-omic and cell-type-specific quantitative trait loci (QTL) analysis, and can be used in proteomics (pQTL) or gene expression (eQTL) analysis at cellular level. This tool enables users to deconvolute bulk proteomes and transcritopmes, as well as to investigate the genetic variations linked to cell-type-specific expression at the protein or mRNA level.
 ---
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
 
 # Install
 
-```{r setup}
+```{r,eval = TRUE, message = FALSE, setup}
 library(devtools)
-install_github("YuePan027/pQTL")
+#install_github("YuePan027/pQTL") # restore once it's public 
 library(pQTL)
 ```
 
 # Quick start
 
-## Cell-type proportion deconvolution 
+## Cell-type proportion deconvolution
 
-This step is used to obtain cell-type proportion. 
+This step is used to obtain cell-type proportion.
 
-A `r Biocpkg("SummarizedExperiment")` object with bulk protein or gene expression contained in `counts` slot, and a "signature matrix" which serves as a reference of known cellular signatures contained as an element in `metadata` slot is required as input file. Note that the proteins or genes in signature matrix can be different from that in assay, but only common proteins or genes will be used to do devonvolution. 
+A `SummarizedExperiment` object with bulk protein or gene expression contained in `counts` slot, and a "signature matrix" which serves as a reference of known cellular signatures contained as an element in `metadata` slot is required as input file. Note that the proteins or genes in signature matrix can be different from that in assay, but only common proteins or genes will be used to do deconvolution.
 
-In this current version, only `CIBERSORT` and `nnls` are supported as the deconvultion methods.
+In this current version, only `CIBERSORT` and `nnls` are supported as the deconvolution methods.
 
-```{r decov1}
-se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
-                           rowData = pQTL::anno_protein)
-metadata(se) <- list(sig_matrix = pQTL::ref_data)
+```{r,eval = TRUE, message = FALSE, decov1}
+se <- SummarizedExperiment(assays = list(counts = protein_data),
+                           rowData = anno_protein)
+metadata(se) <- list(sig_matrix = ref_data)
 se <- deconv(se, "cibersort")
 ```
 
 This step might take a few minutes if there are many proteins or genes in the signature matrix. The cell-type proportion estimates for each sample will be stored as an element (`prop`) in `metadata` slot.
 
-```{r decov2}
+```{r,eval = TRUE, message = FALSE, decov2}
 head(se@metadata$prop)
-boxplot(se@metadata$prop)
+boxplot(se@metadata$prop) # This can be upgraded to ggplot boxplot and composition plot
 ```
 
 Alternatively, if there are cell-type proportion estimates results generated using other methods or obtained from other sources, just save that as an element (`prop`) in `metadata` slot and this deconvolution step can be skipped. Note that the samples in the cell-type proportion estimates must match the samples from bulk protein/gene expression data.
-
 
 ## Feature filtering
 
 The feature filtering can be applied at both proteins/genes and SNPs. This step is optional but highly recommended to filter out some features that are not very informative or do not make much sense biologically. Note that this function is required to run even no filtering is expected to be done (just set `filter_method = "null"`) to obtain a consistent object format for downstream analysis.
 
-To apply feature filtering, annotation files for protein/gene and SNPs are required. 
-The annotation file for proteins/genes should be stored in `rowData()`, where each row corresponds to a protein/gene with it's symbol as row names. The first column should be a character vector indicating which chromosome each protein or gene is on. In addition, it should contain at least a "Start" column with numeric values indicating the start position on that chromosome and a "Symbol" column as a unique name for each protein or gene.
+To apply feature filtering, annotation files for protein/gene and SNPs are required. The annotation file for proteins/genes should be stored in `rowData()`, where each row corresponds to a protein/gene with it's symbol as row names. The first column should be a character vector indicating which chromosome each protein or gene is on. In addition, it should contain at least a "Start" column with numeric values indicating the start position on that chromosome and a "Symbol" column as a unique name for each protein or gene.
 
 ```{r filter1}
 head(rowData(se))
 ```
 
-The information from genetic variants should be stored in a P (the number of SNP) by N (the number of samples, should match the sample in `counts` slot) matrix contained as an element (`SNP_data`) in `metadata` slot. Each matrix entry corresponds to the genotype group indicator (0 for 0/0, 1 for 0/1 and 2 for 1/1) for a sample at a genetic location. The annotations of these SNP should be stored as an element (`anno_SNP`) in `metadata` slot. It should include at least the following columns:  (1) "CHROM" (which chromosome the SNP is on); (2) "POS" (position of that SNP) and (3) "ID" (a unique identifier for each SNP, usually a combination of chromosome and its position).
-
-```{r filter2}
-head(se@metadata$anno_SNP)
-```
+The information from genetic variants should be stored in a P (the number of SNP) by N (the number of samples, should match the sample in `counts` slot) matrix contained as an element (`SNP_data`) in `metadata` slot. Each matrix entry corresponds to the genotype group indicator (0 for 0/0, 1 for 0/1 and 2 for 1/1) for a sample at a genetic location. The annotations of these SNP should be stored as an element (`anno_SNP`) in `metadata` slot. It should include at least the following columns: (1) "CHROM" (which chromosome the SNP is on); (2) "POS" (position of that SNP) and (3) "ID" (a unique identifier for each SNP, usually a combination of chromosome and its position).
 
 For filtering at protein or gene level, only those symbols contained in `target_protein` argument will be kept for following analysis. By default, all proteins or genes will be used.
 
@@ -77,8 +64,9 @@ The results after filtering will be stored as an element (`choose_SNP_list`) in 
 To simplify the analysis, we only kept two targeted proteins as an example.
 
 ```{r filter3}
-se@metadata$SNP_data <- pQTL::SNP_data
-se@metadata$anno_SNP <- pQTL::anno_SNP
+se@metadata$SNP_data <- SNP_data
+se@metadata$anno_SNP <- anno_SNP
+head(se@metadata$anno_SNP) # This should be moved to here
 se <- feature_filter(se, target_protein = c("Gene_5", "Gene_6"), 
                      filter_method = c("allele", "distance"), 
                      filter_allele = 0.25)           
@@ -90,14 +78,13 @@ In this example, only 14 SNPs are kept for the first target protein and only 11 
 unlist(lapply(se@metadata$choose_SNP_list, length))
 ```
 
-
 ## csQTL analysis
 
-In this step, the `TOAST` method is implemented for cell-type-specific differential expression analysis based on samples' genotype. 
+In this step, the `TOAST` method is implemented for cell-type-specific differential expression analysis based on samples' genotype.
 
 The result will be stored as an element (`TOAST_output`) in `metadata` slot. It is a list with the same length as tested proteins or genes where each element consists of a table including protein or gene symbol, SNP ID and p-values from each cell type. A significant p-value indicates that the protein or gene expression is differemt among the sample from different genotype groups.
 
 ```{r csde}
-se <- csDE(se)
+# Need to include more samples in example data. TOAST produces singular matrix errors at small sample size; which name is better,'csDE' or 'csQTL'?
+#se <- csDE(se)
 ```
-
