@@ -30,7 +30,7 @@ csDE <- function(se, BPPARAM = bpparam()){
 
   prop <- se@metadata$prop
   protein_tab <- assay(se)
-  SNP <- se@metadata$SNP_data
+  SNP_dat <- se@metadata$SNP_data
   SNP_ID <- se@metadata$anno_SNP$ID
 
   Res_TOAST <- lapply(1:length(se@metadata$choose_SNP_list), function(x){
@@ -38,7 +38,7 @@ csDE <- function(se, BPPARAM = bpparam()){
     protein_name <- names(se@metadata$choose_SNP_list)[x]
 
     res <- bplapply(1:length(test_protein), function(i){
-      design <- data.frame(factor(t(SNP)[, test_protein[i]]))
+      design <- data.frame(factor(SNP_dat[test_protein[i],]))#data.frame(factor(t(SNP_dat)[, test_protein[i]]))
       Design_out <- makeDesign(design, prop)
       fitted_model <- fitModel(Design_out,
                                as.matrix(protein_tab[protein_name,]))

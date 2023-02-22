@@ -3,7 +3,7 @@
 #' A subset of proteomic data PsychENCODE
 #'
 #' @format ## `protein_data`
-#' A data frame with 2242 rows (protein) and 20 columns (sample).
+#' A data frame with 2242 rows (protein) and 100 columns (sample).
 "protein_data"
 
 
@@ -12,7 +12,7 @@
 #' A data set stores the information of genetic variants at each location.
 #'
 #' @format ## `SNP_data`
-#' A sparse matrix with 344388 rows (SNP) from one chromosome and 20 columns (sample, should match the sample in `protein_data`).
+#' A sparse matrix with 344388 rows (SNP) from one chromosome and 100 columns (sample, should match the sample in `protein_data`).
 #' Each matrix entry corresponds to the genotype group indicator (0, 1 or 2) for a sample at a genetic location.
 "SNP_data"
 
