@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 ```{r setup, eval = TRUE, message = FALSE}
 library(devtools)
 #install_github("YuePan027/pQTL")
+#install_github("YuePan027/pQTL@dev") # from dev branch
 library(pQTL)
 library(ggplot2)
 ```
@@ -66,7 +67,7 @@ Alternatively, if there are cell-type proportion estimates results generated usi
 The feature filtering can be applied at both proteins/genes and SNPs. This step is optional but highly recommended to filter out some features that are not very informative or do not make much sense biologically. Note that this function is required to run even no filtering is expected to be done (just set `filter_method = "null"`) to obtain a consistent object format for downstream analysis.
 
 To apply feature filtering, annotation files for protein/gene and SNPs are required. 
-The annotation file for proteins/genes should be stored in `rowData()`, where each row corresponds to a protein/gene with it's symbol as row names. The first column should be a character vector indicating which chromosome each protein or gene is on. In addition, it should contain at least a "Start" column with numeric values indicating the start position on that chromosome and a "Symbol" column as a unique name for each protein or gene.
+The annotation file for proteins/genes should be stored in `rowData()`, where each row corresponds to a protein/gene with it's symbol as row names. The first column should be a character vector indicating which chromosome each protein or gene is on. In addition, it should contain at least a "Start" column with numeric values indicating the start position on that chromosome, a "End" column with numeric values indicating the end position on that chromosome and a "Symbol" column as a unique name for each protein or gene.
 
 ```{r filter1}
 head(rowData(se))
@@ -89,12 +90,14 @@ The results after filtering will be stored as an element (`choose_SNP_list`) in 
 To simplify the analysis, we only kept two targeted proteins as an example.
 
 ```{r filter3}
-se <- feature_filter(se, target_protein = c("Gene_5", "Gene_6"), 
+se <- feature_filter(se, target_protein = c("Protein_5", "Protein_6"), 
                      filter_method = c("allele", "distance"), 
-                     filter_allele = 0.3)           
+                     filter_allele = 0.25,
+                     filter_geno = 0.05,
+                     ref_position = "TSS")           
 ```
 
-In this example, only 20 SNPs are kept for the first target protein and only 17 SNPs are kept for the second target protein.
+In this example, only 20 SNPs are kept for the first target protein and only 20 SNPs are kept for the second target protein.
 
 ```{r filter4}
 unlist(lapply(se@metadata$choose_SNP_list, length))

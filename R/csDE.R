@@ -4,7 +4,7 @@
 #'
 #' This is a function developed to implement cell-type-specific differential expression using `TOAST`.
 #'
-#' @param se A `SummarizedExperiment` object with bulk protein/gene expression contained in `counts` slot.
+#' @param se A `SummarizedExperiment` object with bulk protein/gene expression data frame contained in `counts` slot.
 #' The information from genetic variants should be stored in a P (the number of SNP) by N (the number of samples, should match the sample in `counts` slot) matrix contained as an element (`SNP_data`) in `metadata` slot.
 #' Each matrix entry corresponds to the genotype group indicator (0, 1 or 2) for a sample at a genetic location.
 #' The annotations of these SNP should be stored as an element (`anno_SNP`) in `metadata` slot.
@@ -28,8 +28,10 @@
 #'
 csDE <- function(se, BPPARAM = bpparam()){
 
+  assay(se) <- as.data.frame(assay(se))
+
   prop <- se@metadata$prop
-  protein_tab <- assay(se)
+  protein_tab <- as.data.frame(assay(se))
   SNP_dat <- se@metadata$SNP_data
   SNP_ID <- se@metadata$anno_SNP$ID
 

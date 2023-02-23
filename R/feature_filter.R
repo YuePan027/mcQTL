@@ -4,7 +4,7 @@
 #'
 #' This is a function developed to implement cell-type proportion deconvolution using either `CIBERSORT` or `nnls`.
 #'
-#' @param se A `SummarizedExperiment` object with bulk protein/gene expression contained in `counts` slot.
+#' @param se A `SummarizedExperiment` object with bulk protein/gene expression data frame contained in `counts` slot.
 #' Annotations on each row (protein or gene) should be stored in rowData() with protein or gene symbol as row names
 #' The first column should be a character vector indicating which chromosome each protein or gene is on.
 #' A "Start" column with numeric values indicating the start position on that chromosome and
@@ -22,7 +22,11 @@
 #' If "allele", then the minor allele frequency below argument `filter_allele` will be filtered out.
 #' If "distance", then only cis-acting SNPs for each protein (defined as SNPs on the same chromosome and within 1M base pair (bp) range of that protein) will be included for downstream analysis.
 #' if "null", then the same SNPs will be used for each protein.
-#' @param filter_allele A numeric value denotes the threshold for minor allele frequency.
+#' @param filter_allele A numeric value denotes the threshold for minor allele frequency. Only works when `filter_method` contains "allele".
+#' @param filter_geno A numeric value denotes the threshold for minimum genotype group proportion. Only works when `filter_method` contains "allele".
+#' @param ref_position A character string denotes the reference position on protein when `filter_method` contains "distance",
+#' where 'TSS" refers to transcription start site, and "genebody" refers to the middle point of "Start" and "End" position.
+
 #'
 #' @return A `SummarizedExperiment`. The results after filtering will be stored as an element (`choose_SNP_list`) in `metadata` slot.
 #' `choose_SNP_list` is a list with the length of the number of proteins for downstream analysis.
@@ -39,7 +43,7 @@
 #' se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
 #'                            rowData = pQTL::anno_protein)
 #' se@metadata <- list(SNP_data = pQTL::SNP_data, anno_SNP = pQTL::anno_SNP)
-#' se <- feature_filter(se, target_protein = c("Gene_5", "Gene_6"),
+#' se <- feature_filter(se, target_protein = c("Protein_5", "Protein_6"),
 #'                      filter_method = c("allele"),
 #'                      filter_allele = 0.25)
 #'
@@ -48,7 +52,9 @@ feature_filter <- function(se,
                    target_protein = NULL,
                    target_SNP = NULL,
                    filter_method = c("allele", "distance", "null"),
-                   filter_allele = 0.25){
+                   filter_allele = 0.25,
+                   filter_geno = 0.05,
+                   ref_position = c("TSS", "genebody")){
 
   if (!all(colnames(assay(se)) == colnames(se@metadata$SNP_data))){
     stop("Samples in protein_data do not match that in SNP_data")
@@ -67,13 +73,13 @@ feature_filter <- function(se,
     se@metadata$anno_SNP <- se@metadata$anno_SNP[match(target_SNP, se@metadata$anno_SNP$ID), , drop=F]
   }
 
-  res_TOAST <- NULL
   rowData(se) <- rowData(se)[match(rownames(assay(se)), rowData(se)$Symbol),]
   choose_SNP_list <- rep(list(1:nrow(se@metadata$SNP_data)), each = nrow(assay(se)))
 
   if("allele" %in% filter_method){
     prop <- apply(se@metadata$SNP_data, 1, prop_allele)
-    idx <- which(prop > filter_allele & prop <= 1 - filter_allele)
+    prop2 <- apply(se@metadata$SNP_data, 1, prop_geno)
+    idx <- which(pmin(prop, 1-prop) > filter_allele & prop2 > filter_geno)
     se@metadata$SNP_data <- se@metadata$SNP_data[idx, , drop=F]
     se@metadata$anno_SNP <- se@metadata$anno_SNP[idx, , drop=F]
     choose_SNP_list <- rep(list(1:nrow(se@metadata$SNP_data)), each = nrow(assay(se)))
@@ -81,7 +87,12 @@ feature_filter <- function(se,
   if("distance" %in% filter_method){
     choose_SNP_list <- lapply(1:nrow(assay(se)), function(i){
       df <- rowData(se)[which(rowData(se)$Symbol == rownames(assay(se))[i]),]
-      idx2 <- which((abs(as.numeric(se@metadata$anno_SNP$POS) - df$Start) < 1000000) &
+      if(ref_position == "TSS"){
+        df$ref_pos <- df$Start
+      } else if (ref_position == "genebody"){
+        df$ref_pos <- (df$Start + df$end)/2
+      }
+      idx2 <- which((abs(as.numeric(se@metadata$anno_SNP$POS) - df$ref_pos) < 1000000) &
                       se@metadata$anno_SNP$CHROM == df[1,1])
       return(idx2)
     })

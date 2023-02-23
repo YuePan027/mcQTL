@@ -9,11 +9,13 @@ feature_filter(
   target_protein = NULL,
   target_SNP = NULL,
   filter_method = c("allele", "distance", "null"),
-  filter_allele = 0.25
+  filter_allele = 0.25,
+  filter_geno = 0.05,
+  ref_position = c("TSS", "genebody")
 )
 }
 \arguments{
-\item{se}{A `SummarizedExperiment` object with bulk protein/gene expression contained in `counts` slot.
+\item{se}{A `SummarizedExperiment` object with bulk protein/gene expression data frame contained in `counts` slot.
 Annotations on each row (protein or gene) should be stored in rowData() with protein or gene symbol as row names
 The first column should be a character vector indicating which chromosome each protein or gene is on.
 A "Start" column with numeric values indicating the start position on that chromosome and
@@ -35,7 +37,12 @@ If "allele", then the minor allele frequency below argument `filter_allele` will
 If "distance", then only cis-acting SNPs for each protein (defined as SNPs on the same chromosome and within 1M base pair (bp) range of that protein) will be included for downstream analysis.
 if "null", then the same SNPs will be used for each protein.}
 
-\item{filter_allele}{A numeric value denotes the threshold for minor allele frequency.}
+\item{filter_allele}{A numeric value denotes the threshold for minor allele frequency. Only works when `filter_method` contains "allele".}
+
+\item{filter_geno}{A numeric value denotes the threshold for minimum genotype group proportion. Only works when `filter_method` contains "allele".}
+
+\item{ref_position}{A character string denotes the reference position on protein when `filter_method` contains "distance",
+where 'TSS" refers to transcription start site, and "genebody" refers to the middle point of "Start" and "End" position.}
 }
 \value{
 A `SummarizedExperiment`. The results after filtering will be stored as an element (`choose_SNP_list`) in `metadata` slot.
@@ -54,8 +61,8 @@ This is a function developed to implement cell-type proportion deconvolution usi
 se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
                            rowData = pQTL::anno_protein)
 se@metadata <- list(SNP_data = pQTL::SNP_data, anno_SNP = pQTL::anno_SNP)
-se <- feature_filter(se, target_protein = c("Gene_1", "Gene_2"),
-                     filter_method = c("allele", "distance"),
+se <- feature_filter(se, target_protein = c("Protein_5", "Protein_6"),
+                     filter_method = c("allele"),
                      filter_allele = 0.25)
 
 

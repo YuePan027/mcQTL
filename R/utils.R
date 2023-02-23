@@ -13,6 +13,23 @@ prop_allele <- function(x){
 }
 
 
+#' Genotype proportion
+#'
+#' This function calculates the genotype proportion in the smallest genotype group.
+#'
+#' @param x A vector consists of 0, 1 or 2 as genotype group indicator in a genetic location in the genome.
+#'
+#' @return A numeric value for genotype proportion.
+#'
+#'
+prop_geno <- function(x){
+  prop <- min(table(x)/length(x))
+  return(prop)
+}
+
+
+
+
 # CIBERSORT R script v1.04 (last updated 10-24-2016)
 # Note: Signature matrix construction is not currently available; use java version for full functionality.
 # Author: Aaron M. Newman, Stanford University (amnewman@stanford.edu)

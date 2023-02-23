@@ -7,7 +7,7 @@
 csDE(se, BPPARAM = bpparam())
 }
 \arguments{
-\item{se}{A `SummarizedExperiment` object with bulk protein/gene expression contained in `counts` slot.
+\item{se}{A `SummarizedExperiment` object with bulk protein/gene expression data frame contained in `counts` slot.
 The information from genetic variants should be stored in a P (the number of SNP) by N (the number of samples, should match the sample in `counts` slot) matrix contained as an element (`SNP_data`) in `metadata` slot.
 Each matrix entry corresponds to the genotype group indicator (0, 1 or 2) for a sample at a genetic location.
 The annotations of these SNP should be stored as an element (`anno_SNP`) in `metadata` slot.
@@ -26,5 +26,5 @@ A `SummarizedExperiment`. The csDE results will be stored as an element (`TOAST_
 This function returns a `SummarizedExperiment` object including csDE proteins based on samples' genotype.
 }
 \details{
-This is a function developed to implement cell-type-specific differential expression using either `TOAST`.
+This is a function developed to implement cell-type-specific differential expression using `TOAST`.
 }

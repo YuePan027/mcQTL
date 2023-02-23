@@ -7,7 +7,7 @@
 deconv(se, method = c("cibersort", "nnls"), TCA_update = FALSE)
 }
 \arguments{
-\item{se}{A `SummarizedExperiment` object with bulk protein/gene expression contained in `counts` slot, and
+\item{se}{A `SummarizedExperiment` object with bulk protein/gene expression data frame contained in `counts` slot, and
 a "signature matrix" which serves as a reference of known cellular signatures contained as an element in `metadata` slot.}
 
 \item{method}{A character string denotes which deconvolution method to use. In this current version, only `CIBERSORT` or `nnls` is supported.}
