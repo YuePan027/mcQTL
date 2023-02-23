@@ -62,8 +62,7 @@ se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
                            rowData = pQTL::anno_protein)
 se@metadata <- list(SNP_data = pQTL::SNP_data, anno_SNP = pQTL::anno_SNP)
 se <- feature_filter(se, target_protein = c("Protein_5", "Protein_6"),
-                     filter_method = c("allele"),
-                     filter_allele = 0.25)
+                     filter_method = c("allele"))
 
 
 }

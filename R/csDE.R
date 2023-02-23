@@ -31,7 +31,7 @@ csDE <- function(se, BPPARAM = bpparam()){
   assay(se) <- as.data.frame(assay(se))
 
   prop <- se@metadata$prop
-  protein_tab <- as.data.frame(assay(se))
+  protein_tab <- as.data.frame(se@metadata$target_dat)
   SNP_dat <- se@metadata$SNP_data
   SNP_ID <- se@metadata$anno_SNP$ID
 

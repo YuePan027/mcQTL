@@ -81,7 +81,7 @@ se@metadata$anno_SNP <- pQTL::anno_SNP
 head(se@metadata$anno_SNP)
 ```
 
-For filtering at protein or gene level, only those symbols contained in `target_protein` argument will be kept for following analysis. By default, all proteins or genes will be used.
+For filtering at protein or gene level, only those symbols contained in `target_protein` argument will be kept for csQTL analysis in the next step. By default, all proteins or genes will be used.
 
 For filtering at SNP level, there are three options: (1) only those symbols contained in `target_SNP` argument will be kept and if not provided, all SNPs will be used for further filtering; (2) filter out the SNPs that have minor allele frequency below the threshold defined by `filter_allele` argument (`filter_method = "allele"`) and (3) restrict to cis-regulatory variants, i.e. the SNPs up to 1 Mb proximal to the start of the gene (`filter_method = "distance"`).
 
@@ -119,3 +119,13 @@ We can check the results from csQTL analysis for the first target protein by cal
 ```{r csde2}
 head(se@metadata$TOAST_output[[1]])
 ```
+
+## TCA deconvolution (optional)
+
+The cell-type-specific gene expression per bulk sample can also be estimated using `TCA` deconvolution method given cellular composition (stored in `prop` in `metadata` slot). The output will be stored as an element (`TCA_deconv`) in `metadata` slot. It is a list with the length of the number of cell types (same as cell types in `prop` in `metadata` slot). Each element stores a deconvoluted protein expression per bulk sample. Below is an example to check the deconvoluted cellular expression for the first cell type (restricted to first 5 proteins and first 5 samples):
+
+```{r tca}
+se <- TCA_deconv(se)
+se@metadata$TCA_deconv[[1]][1:5,1:5]
+```
+

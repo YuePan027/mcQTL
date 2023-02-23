@@ -44,8 +44,7 @@
 #'                            rowData = pQTL::anno_protein)
 #' se@metadata <- list(SNP_data = pQTL::SNP_data, anno_SNP = pQTL::anno_SNP)
 #' se <- feature_filter(se, target_protein = c("Protein_5", "Protein_6"),
-#'                      filter_method = c("allele"),
-#'                      filter_allele = 0.25)
+#'                      filter_method = c("allele"))
 #'
 #'
 feature_filter <- function(se,
@@ -56,6 +55,8 @@ feature_filter <- function(se,
                    filter_geno = 0.05,
                    ref_position = c("TSS", "genebody")){
 
+  assay(se) <- as.data.frame(assay(se))
+
   if (!all(colnames(assay(se)) == colnames(se@metadata$SNP_data))){
     stop("Samples in protein_data do not match that in SNP_data")
   }
@@ -65,7 +66,8 @@ feature_filter <- function(se,
   }
 
   if(!is.null(target_protein)){
-    se <- se[target_protein, ]
+    se@metadata$target_dat <- assay(se)[target_protein, ]
+    #se <- se[target_protein, ]
   }
 
   if(!is.null(target_SNP)){
@@ -73,8 +75,8 @@ feature_filter <- function(se,
     se@metadata$anno_SNP <- se@metadata$anno_SNP[match(target_SNP, se@metadata$anno_SNP$ID), , drop=F]
   }
 
-  rowData(se) <- rowData(se)[match(rownames(assay(se)), rowData(se)$Symbol),]
-  choose_SNP_list <- rep(list(1:nrow(se@metadata$SNP_data)), each = nrow(assay(se)))
+  #rowData(se) <- rowData(se)[match(rownames(assay(se)), rowData(se)$Symbol),]
+  choose_SNP_list <- rep(list(1:nrow(se@metadata$SNP_data)), each = length(target_protein))
 
   if("allele" %in% filter_method){
     prop <- apply(se@metadata$SNP_data, 1, prop_allele)
@@ -82,11 +84,11 @@ feature_filter <- function(se,
     idx <- which(pmin(prop, 1-prop) > filter_allele & prop2 > filter_geno)
     se@metadata$SNP_data <- se@metadata$SNP_data[idx, , drop=F]
     se@metadata$anno_SNP <- se@metadata$anno_SNP[idx, , drop=F]
-    choose_SNP_list <- rep(list(1:nrow(se@metadata$SNP_data)), each = nrow(assay(se)))
+    choose_SNP_list <- rep(list(1:nrow(se@metadata$SNP_data)), each = length(target_protein))
   }
   if("distance" %in% filter_method){
-    choose_SNP_list <- lapply(1:nrow(assay(se)), function(i){
-      df <- rowData(se)[which(rowData(se)$Symbol == rownames(assay(se))[i]),]
+    choose_SNP_list <- lapply(1:length(target_protein), function(i){
+      df <- rowData(se)[which(rowData(se)$Symbol == target_protein[i]),]
       if(ref_position == "TSS"){
         df$ref_pos <- df$Start
       } else if (ref_position == "genebody"){
@@ -96,9 +98,10 @@ feature_filter <- function(se,
                       se@metadata$anno_SNP$CHROM == df[1,1])
       return(idx2)
     })
-    names(choose_SNP_list) <- rownames(assay(se))
+    names(choose_SNP_list) <- target_protein
     idx3 <- which(unlist(lapply(choose_SNP_list, length)) != 0)
-    se <- se[idx3,]
+    #se <- se[idx3,]
+    se@metadata$target_dat <- se@metadata$target_dat[idx3,]
     choose_SNP_list <- choose_SNP_list[idx3]
   }
 
