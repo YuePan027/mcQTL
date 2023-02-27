@@ -11,7 +11,8 @@ feature_filter(
   filter_method = c("allele", "distance", "null"),
   filter_allele = 0.25,
   filter_geno = 0.05,
-  ref_position = c("TSS", "genebody")
+  ref_position = c("TSS", "genebody"),
+  BPPARAM = bpparam()
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ if "null", then the same SNPs will be used for each protein.}
 
 \item{ref_position}{A character string denotes the reference position on protein when `filter_method` contains "distance",
 where 'TSS" refers to transcription start site, and "genebody" refers to the middle point of "Start" and "End" position.}
+
+\item{BPPARAM}{For applying `bplapply`.}
 }
 \value{
 A `SummarizedExperiment`. The results after filtering will be stored as an element (`choose_SNP_list`) in `metadata` slot.

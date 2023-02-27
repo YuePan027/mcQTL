@@ -75,6 +75,8 @@ head(rowData(se))
 
 The information from genetic variants should be stored in a P (the number of SNP) by N (the number of samples, should match the sample in `counts` slot) matrix contained as an element (`SNP_data`) in `metadata` slot. Each matrix entry corresponds to the genotype group indicator (0 for 0/0, 1 for 0/1 and 2 for 1/1) for a sample at a genetic location. The annotations of these SNP should be stored as an element (`anno_SNP`) in `metadata` slot. It should include at least the following columns:  (1) "CHROM" (which chromosome the SNP is on); (2) "POS" (position of that SNP) and (3) "ID" (a unique identifier for each SNP, usually a combination of chromosome and its position).
 
+The example SNP data provided here were restricted to chromosome 9 only. In practice, the SNPs may from multiple or even all chromosomes.
+
 ```{r filter2}
 se@metadata$SNP_data <- pQTL::SNP_data
 se@metadata$anno_SNP <- pQTL::anno_SNP
@@ -87,10 +89,11 @@ For filtering at SNP level, there are three options: (1) only those symbols cont
 
 The results after filtering will be stored as an element (`choose_SNP_list`) in `metadata` slot. It is a list with the length of the number of proteins for downstream analysis. Each element stores the index of SNPs to be tested for corresponding protein. The proteins with no SNPs correspond to it will be removed from the returned list.
 
-To simplify the analysis, we only kept two targeted proteins as an example.
+To simplify the analysis, we only kept 10 targeted proteins from chromosome 9 as an example.
 
 ```{r filter3}
-se <- feature_filter(se, target_protein = c("Protein_5", "Protein_6"), 
+target_protein <- rowData(se)[rowData(se)$Chr == 9,][1:10, "Symbol"]
+se <- feature_filter(se, target_protein = target_protein, 
                      filter_method = c("allele", "distance"), 
                      filter_allele = 0.25,
                      filter_geno = 0.05,

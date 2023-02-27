@@ -23,6 +23,7 @@
 #' @importFrom BiocParallel bpparam
 #' @importFrom magrittr "%>%"
 #' @importFrom purrr map
+#'
 #' @export
 #'
 #'
@@ -38,6 +39,7 @@ csDE <- function(se, BPPARAM = bpparam()){
   Res_TOAST <- lapply(1:length(se@metadata$choose_SNP_list), function(x){
     test_protein <- se@metadata$choose_SNP_list[[x]]
     protein_name <- names(se@metadata$choose_SNP_list)[x]
+    cat("csDE test for protein", protein_name, "\n")
 
     res <- bplapply(1:length(test_protein), function(i){
       design <- data.frame(factor(SNP_dat[test_protein[i],]))#data.frame(factor(t(SNP_dat)[, test_protein[i]]))
