@@ -140,19 +140,17 @@ devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
 #> package 'e1071' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\ypan\AppData\Local\Temp\RtmpUpa2V4\downloaded_packages
-#>          checking for file 'C:\Users\ypan\AppData\Local\Temp\RtmpUpa2V4\remotes301058a4368\YuePan027-mcQTL-131a8d6/DESCRIPTION' ...  ✔  checking for file 'C:\Users\ypan\AppData\Local\Temp\RtmpUpa2V4\remotes301058a4368\YuePan027-mcQTL-131a8d6/DESCRIPTION'
-#>       ─  preparing 'pQTL':
+#>  C:\Users\ypan\AppData\Local\Temp\RtmpiwZWXh\downloaded_packages
+#>          checking for file 'C:\Users\ypan\AppData\Local\Temp\RtmpiwZWXh\remotes231852056eda\YuePan027-mcQTL-4bb8ffe/DESCRIPTION' ...  ✔  checking for file 'C:\Users\ypan\AppData\Local\Temp\RtmpiwZWXh\remotes231852056eda\YuePan027-mcQTL-4bb8ffe/DESCRIPTION'
+#>       ─  preparing 'mcQTL':
 #>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
 #>       ─  checking for LF line-endings in source and make files and shell scripts
 #> ─  checking for empty or unneeded directories
-#>       ─  building 'pQTL_0.1.0.tar.gz'
+#>       ─  building 'mcQTL_0.1.0.tar.gz'
 #>      
 #> 
 library(mcQTL)
-#> Warning: package 'matrixStats' was built under R version 4.2.2
 library(ggplot2)
-#> Warning: package 'ggplot2' was built under R version 4.2.2
 library(reshape2)
 ```
 
@@ -173,9 +171,9 @@ In this current version, only `CIBERSORT` and `nnls` are supported as
 the deconvolution methods.
 
 ``` r
-se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
-                           rowData = pQTL::anno_protein)
-metadata(se) <- list(sig_matrix = pQTL::ref_data)
+se <- SummarizedExperiment(assays = list(counts = mcQTL::protein_data),
+                           rowData = mcQTL::anno_protein)
+metadata(se) <- list(sig_matrix = mcQTL::ref_data)
 se <- deconv(se, "cibersort")
 ```
 
@@ -259,8 +257,8 @@ The example SNP data provided here were restricted to chromosome 9 only.
 In practice, the SNPs may from multiple or even all chromosomes.
 
 ``` r
-se@metadata$SNP_data <- pQTL::SNP_data
-se@metadata$anno_SNP <- pQTL::anno_SNP
+se@metadata$SNP_data <- mcQTL::SNP_data
+se@metadata$anno_SNP <- mcQTL::anno_SNP
 head(se@metadata$anno_SNP)
 #>        CHROM       POS          ID
 #> 237392     9 104596634 9:104596634
@@ -346,7 +344,7 @@ system.time(se <- csQTL(se))
 #> csQTL test for protein Protein_261 
 #> csQTL test for protein Protein_283
 #>    user  system elapsed 
-#>    3.28    1.11  453.86
+#>    3.55    1.28  457.83
 ```
 
 We can check the results from csQTL analysis for the first target
@@ -377,10 +375,10 @@ first 5 samples):
 
 ``` r
 se <- TCA_deconv(se)
-#> INFO [2023-02-27 14:55:20] Validating input...
-#> INFO [2023-02-27 14:55:20] Starting tensor for estimating Z...
-#> INFO [2023-02-27 14:55:20] Estimate tensor...
-#> INFO [2023-02-27 14:55:23] Finished estimating tensor.
+#> INFO [2023-02-27 15:22:29] Validating input...
+#> INFO [2023-02-27 15:22:29] Starting tensor for estimating Z...
+#> INFO [2023-02-27 15:22:29] Estimate tensor...
+#> INFO [2023-02-27 15:22:32] Finished estimating tensor.
 se@metadata$TCA_deconv[[1]][1:5,1:5]
 #>           Sample_1 Sample_2 Sample_3 Sample_4 Sample_5
 #> Protein_1 15.76586 16.08454 15.82306 15.76538 15.63249

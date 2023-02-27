@@ -18,8 +18,8 @@ knitr::opts_chunk$set(
 
 # Install
 
-```{r setup, eval = FALSE, message = FALSE}
-devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
+```{r setup, message = FALSE}
+#devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
 library(mcQTL)
 library(ggplot2)
 ```

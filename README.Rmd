@@ -29,7 +29,7 @@ r Biocpkg("TOAST"), for parallel computing implementation.
 
 Please install from github repository “YuePan027/mcQTL” under "dev" branch.
 
-```{r setup, eval = FALSE, message = FALSE, warning = FALSE}
+```{r setup, message = FALSE, warning = FALSE}
 devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
 library(mcQTL)
 library(ggplot2)
