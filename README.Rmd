@@ -1,8 +1,8 @@
 ---
-title: "README"
+title: "mcQTL: Multi-omic and Cell-type-specific Quantitative Trait Loci"
 author: "Yue Pan"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: BiocStyle::html_document
+output: github_document
 ---
 
 ```{r, echo = FALSE}
