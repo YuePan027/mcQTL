@@ -1,14 +1,12 @@
 Package: mcQTL
 Type: Package
-Title: Cell-type-specific Quantitative Trait Loci (QTL)
+Title: Multi-omic and Cell-type-specific Quantitative Trait Loci
 Version: 0.1.0
 Author: Authors@R: c(
     person("Yue", "Pan", email = "yuep027@gmail.com", role = c("aut", "cre")),
     person("Qian", "Li", email = "Qian.Li@STJUDE.ORG", role = c("aut"))
 Maintainer: Yue Pan <yuep027@gmail.com>
-Description: A tool for cell-type-specific (cs) QTL that can be applied to proteomics (pQTL) and 
-    gene expression (eQTL) to study the genetic variants that are associated with 
-    gene expression at the protein or mRNA level. 
+Description: A tool that estimates cell type proportions in bulk proteomes by either using single data source reference or borrowing information in matched transcriptomes. Based on the deconvoluted cellular composition, mcQTL further performs Quantitative Trait Loci mapping at cellular resolution, as well as integrates and visualizes multi-source profiles at bulk and cell type levels.
 License: GPL-3
 Encoding: UTF-8
 Suggests: 

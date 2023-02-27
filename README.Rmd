@@ -29,7 +29,7 @@ r Biocpkg("TOAST"), for parallel computing implementation.
 
 Please install from github repository “YuePan027/mcQTL” under "dev" branch.
 
-```{r setup, eval = TRUE, message = FALSE}
+```{r setup, eval = FALSE, message = FALSE, warning = FALSE}
 devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
 library(mcQTL)
 library(ggplot2)
@@ -47,9 +47,9 @@ A `SummarizedExperiment` object with bulk protein or gene expression contained i
 In this current version, only `CIBERSORT` and `nnls` are supported as the deconvolution methods.
 
 ```{r decov1}
-se <- SummarizedExperiment(assays = list(counts = pQTL::protein_data),
-                           rowData = pQTL::anno_protein)
-metadata(se) <- list(sig_matrix = pQTL::ref_data)
+se <- SummarizedExperiment(assays = list(counts = mcQTL::protein_data),
+                           rowData = mcQTL::anno_protein)
+metadata(se) <- list(sig_matrix = mcQTL::ref_data)
 se <- deconv(se, "cibersort")
 ```
 
@@ -88,8 +88,8 @@ The information from genetic variants should be stored in a P (the number of SNP
 The example SNP data provided here were restricted to chromosome 9 only. In practice, the SNPs may from multiple or even all chromosomes.
 
 ```{r filter2}
-se@metadata$SNP_data <- pQTL::SNP_data
-se@metadata$anno_SNP <- pQTL::anno_SNP
+se@metadata$SNP_data <- mcQTL::SNP_data
+se@metadata$anno_SNP <- mcQTL::anno_SNP
 head(se@metadata$anno_SNP)
 ```
 
