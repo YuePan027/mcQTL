@@ -1,6 +1,6 @@
-#' Cell-type-specific differential expression (csDE)
+#' Cell-type-specific differential expression (csQTL)
 #'
-#' This function returns a `SummarizedExperiment` object including csDE proteins based on samples' genotype.
+#' This function returns a `SummarizedExperiment` object including csQTL proteins based on samples' genotype.
 #'
 #' This is a function developed to implement cell-type-specific differential expression using `TOAST`.
 #'
@@ -15,7 +15,7 @@
 #' This can be obtained by running `deconv()` before any filtering steps, or use any source data directly.
 #' @param BPPARAM For applying `bplapply`.
 #'
-#' @return A `SummarizedExperiment`. The csDE results will be stored as an element (`TOAST_output`) in `metadata` slot.
+#' @return A `SummarizedExperiment`. The csQTL results will be stored as an element (`TOAST_output`) in `metadata` slot.
 #'
 #' @import SummarizedExperiment
 #' @import TOAST
@@ -27,7 +27,7 @@
 #' @export
 #'
 #'
-csDE <- function(se, BPPARAM = bpparam()){
+csQTL <- function(se, BPPARAM = bpparam()){
 
   assay(se) <- as.data.frame(assay(se))
 
@@ -39,7 +39,7 @@ csDE <- function(se, BPPARAM = bpparam()){
   Res_TOAST <- lapply(1:length(se@metadata$choose_SNP_list), function(x){
     test_protein <- se@metadata$choose_SNP_list[[x]]
     protein_name <- names(se@metadata$choose_SNP_list)[x]
-    cat("csDE test for protein", protein_name, "\n")
+    cat("csQTL test for protein", protein_name, "\n")
 
     res <- bplapply(1:length(test_protein), function(i){
       design <- data.frame(factor(SNP_dat[test_protein[i],]))#data.frame(factor(t(SNP_dat)[, test_protein[i]]))

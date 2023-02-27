@@ -1,4 +1,4 @@
-Package: pQTL
+Package: mcQTL
 Type: Package
 Title: Cell-type-specific Quantitative Trait Loci (QTL)
 Version: 0.1.0

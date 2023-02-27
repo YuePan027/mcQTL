@@ -1,0 +1,132 @@
+---
+title: "mcQTL: Multi-omic and Cell-type-specific Quantitative Trait Loci"
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{mcQTL: Multi-omic and Cell-type-specific Quantitative Trait Loci}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+abstract: >
+  mcQTL (Multi-omic and Cell-type-specific Quantitative Trait Loci) is a tool that estimates cell type proportions in bulk proteomes by either using single data source reference or borrowing information in matched transcriptomes. Based on the deconvoluted cellular composition, mcQTL further performs Quantitative Trait Loci mapping at cellular resolution, as well as integrates and visualizes multi-source profiles at bulk and cell type levels. 
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Install
+
+```{r setup, eval = TRUE, message = FALSE}
+devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
+library(mcQTL)
+library(ggplot2)
+```
+
+# Quick start
+
+## Cell-type proportion deconvolution 
+
+This step is used to obtain cell-type proportion. 
+
+A `SummarizedExperiment` object with bulk protein or gene expression contained in `counts` slot, and a "signature matrix" which serves as a reference of known cellular signatures contained as an element in `metadata` slot is required as input file. Note that the proteins or genes in signature matrix can be different from that in assay, but only common proteins or genes will be used to do deconvolution. 
+
+In this current version, only `CIBERSORT` and `nnls` are supported as the deconvolution methods.
+
+```{r decov1}
+se <- SummarizedExperiment(assays = list(counts = mcQTL::protein_data),
+                           rowData = mcQTL::anno_protein)
+metadata(se) <- list(sig_matrix = mcQTL::ref_data)
+se <- deconv(se, "cibersort")
+```
+
+This step might take a few minutes if there are many proteins or genes in the signature matrix. The cell-type proportion estimates for each sample will be stored as an element (`prop`) in `metadata` slot.
+
+```{r decov2, fig.width=7, fig.height=5}
+head(se@metadata$prop)
+
+ggplot(data.frame(reshape2::melt(se@metadata$prop)), 
+       aes(x = Var2, y = value, fill = Var2)) +
+  geom_point(position = position_jitterdodge(jitter.width = 0.1,
+                                           dodge.width = 0.7),
+           aes(fill = Var2, color = Var2),
+           pch = 21, alpha = 0.5) +
+  geom_boxplot(lwd=0.7, outlier.shape = NA) +
+  theme_classic() +
+  xlab("Cell type") + ylab("Estimated proportion")
+```
+
+Alternatively, if there are cell-type proportion estimates results generated using other methods or obtained from other sources, just save that as an element (`prop`) in `metadata` slot and this deconvolution step can be skipped. Note that the samples in the cell-type proportion estimates must match the samples from bulk protein/gene expression data.
+
+
+## Feature filtering
+
+The feature filtering can be applied at both proteins/genes and SNPs. This step is optional but highly recommended to filter out some features that are not very informative or do not make much sense biologically. Note that this function is required to run even no filtering is expected to be done (just set `filter_method = "null"`) to obtain a consistent object format for downstream analysis.
+
+To apply feature filtering, annotation files for protein/gene and SNPs are required. 
+The annotation file for proteins/genes should be stored in `rowData()`, where each row corresponds to a protein/gene with it's symbol as row names. The first column should be a character vector indicating which chromosome each protein or gene is on. In addition, it should contain at least a "Start" column with numeric values indicating the start position on that chromosome, a "End" column with numeric values indicating the end position on that chromosome and a "Symbol" column as a unique name for each protein or gene.
+
+```{r filter1}
+head(rowData(se))
+```
+
+The information from genetic variants should be stored in a P (the number of SNP) by N (the number of samples, should match the sample in `counts` slot) matrix contained as an element (`SNP_data`) in `metadata` slot. Each matrix entry corresponds to the genotype group indicator (0 for 0/0, 1 for 0/1 and 2 for 1/1) for a sample at a genetic location. The annotations of these SNP should be stored as an element (`anno_SNP`) in `metadata` slot. It should include at least the following columns:  (1) "CHROM" (which chromosome the SNP is on); (2) "POS" (position of that SNP) and (3) "ID" (a unique identifier for each SNP, usually a combination of chromosome and its position).
+
+The example SNP data provided here were restricted to chromosome 9 only. In practice, the SNPs may from multiple or even all chromosomes.
+
+```{r filter2}
+se@metadata$SNP_data <- mcQTL::SNP_data
+se@metadata$anno_SNP <- mcQTL::anno_SNP
+head(se@metadata$anno_SNP)
+```
+
+For filtering at protein or gene level, only those symbols contained in `target_protein` argument will be kept for csQTL analysis in the next step. By default, all proteins or genes will be used.
+
+For filtering at SNP level, there are three options: (1) only those symbols contained in `target_SNP` argument will be kept and if not provided, all SNPs will be used for further filtering; (2) filter out the SNPs that have minor allele frequency below the threshold defined by `filter_allele` argument (`filter_method = "allele"`) and (3) restrict to cis-regulatory variants, i.e. the SNPs up to 1 Mb proximal to the start of the gene (`filter_method = "distance"`).
+
+The results after filtering will be stored as an element (`choose_SNP_list`) in `metadata` slot. It is a list with the length of the number of proteins for downstream analysis. Each element stores the index of SNPs to be tested for corresponding protein. The proteins with no SNPs correspond to it will be removed from the returned list.
+
+To simplify the analysis, we only kept 10 targeted proteins from chromosome 9 as an example.
+
+```{r filter3}
+target_protein <- rowData(se)[rowData(se)$Chr == 9,][1:10, "Symbol"]
+se <- feature_filter(se, target_protein = target_protein, 
+                     filter_method = c("allele", "distance"), 
+                     filter_allele = 0.25,
+                     filter_geno = 0.05,
+                     ref_position = "TSS")           
+```
+
+In this example, only 20 SNPs are kept for the first target protein and only 20 SNPs are kept for the second target protein.
+
+```{r filter4}
+unlist(lapply(se@metadata$choose_SNP_list, length))
+```
+
+
+## csQTL analysis
+
+In this step, the `TOAST` method is implemented for cell-type-specific differential expression analysis based on samples' genotype. 
+
+The result will be stored as an element (`TOAST_output`) in `metadata` slot. It is a list with the same length as tested proteins or genes where each element consists of a table including protein or gene symbol, SNP ID and p-values from each cell type. A significant p-value indicates that the protein or gene expression is different among the sample from different genotype groups.
+
+```{r csQTL1}
+system.time(se <- csQTL(se))
+
+```
+We can check the results from csQTL analysis for the first target protein by calling:
+
+```{r csQTL2}
+head(se@metadata$TOAST_output[[1]])
+```
+
+## TCA deconvolution (optional)
+
+The cell-type-specific gene expression per bulk sample can also be estimated using `TCA` deconvolution method given cellular composition (stored in `prop` in `metadata` slot). The output will be stored as an element (`TCA_deconv`) in `metadata` slot. It is a list with the length of the number of cell types (same as cell types in `prop` in `metadata` slot). Each element stores a deconvoluted protein expression per bulk sample. Below is an example to check the deconvoluted cellular expression for the first cell type (restricted to first 5 proteins and first 5 samples):
+
+```{r tca}
+se <- TCA_deconv(se)
+se@metadata$TCA_deconv[[1]][1:5,1:5]
+```
+

@@ -2,7 +2,7 @@
 
 export(CIBERSORT)
 export(TCA_deconv)
-export(csDE)
+export(csQTL)
 export(deconv)
 export(feature_filter)
 import(SummarizedExperiment)

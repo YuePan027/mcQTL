@@ -1,12 +1,8 @@
 ---
-title: "csQTL"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{csQTL}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
-abstract: >
-  This is a tool for cell-type-specific quantitative trait loci (csQTL) analysis, which may be used in proteomics (pQTL) or gene expression (eQTL) to investigate the genetic variations linked to gene expression at the protein or mRNA level.
+title: "README"
+author: "Yue Pan"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: github_document
 ---
 
 ```{r, echo = FALSE}
@@ -16,14 +12,28 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Install
+# Overview 
+
+mcQTL (Multi-omic and Cell-type-specific Quantitative Trait Loci) is a tool that estimates cell type proportions in bulk proteomes by either using single data source reference or borrowing information in matched transcriptomes. Based on the deconvoluted cellular composition, mcQTL further performs Quantitative Trait Loci mapping at cellular resolution, as well as integrates and visualizes multi-source profiles at bulk and cell type levels. 
+
+
+# Installation 
+
+mcQTL depends on the following packages: 
+
+r Biocpkg("SummarizedExperiment"), for data manipulation, 
+
+r Biocpkg("BiocParallel"), for parallel computing implementation, 
+
+r Biocpkg("TOAST"), for parallel computing implementation. 
+
+Please install from github repository “YuePan027/mcQTL” under "dev" branch.
 
 ```{r setup, eval = TRUE, message = FALSE}
-library(devtools)
-#install_github("YuePan027/pQTL")
-#install_github("YuePan027/pQTL@dev") # from dev branch
-library(pQTL)
+devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
+library(mcQTL)
 library(ggplot2)
+library(reshape2)
 ```
 
 # Quick start
@@ -113,13 +123,13 @@ In this step, the `TOAST` method is implemented for cell-type-specific different
 
 The result will be stored as an element (`TOAST_output`) in `metadata` slot. It is a list with the same length as tested proteins or genes where each element consists of a table including protein or gene symbol, SNP ID and p-values from each cell type. A significant p-value indicates that the protein or gene expression is different among the sample from different genotype groups.
 
-```{r csde1}
-system.time(se <- csDE(se))
+```{r csQTL1}
+system.time(se <- csQTL(se))
 
 ```
 We can check the results from csQTL analysis for the first target protein by calling:
 
-```{r csde2}
+```{r csQTL2}
 head(se@metadata$TOAST_output[[1]])
 ```
 
