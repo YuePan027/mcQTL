@@ -2,7 +2,7 @@
 title: "README"
 author: "Yue Pan"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: github_document
+output: BiocStyle::html_document
 ---
 
 ```{r, echo = FALSE}
@@ -10,6 +10,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(BiocStyle)
 ```
 
 # Overview 
@@ -21,16 +22,19 @@ mcQTL (Multi-omic and Cell-type-specific Quantitative Trait Loci) is a tool that
 
 mcQTL depends on the following packages: 
 
-r Biocpkg("SummarizedExperiment"), for data manipulation, 
+`r Biocpkg("SummarizedExperiment")`, for data manipulation, 
 
-r Biocpkg("BiocParallel"), for parallel computing implementation, 
+`r Biocpkg("BiocParallel")`, for parallel computing implementation, 
 
-r Biocpkg("TOAST"), for parallel computing implementation. 
+`r Biocpkg("TOAST")`, for parallel computing implementation. 
 
 Please install from github repository “YuePan027/mcQTL” under "dev" branch.
 
-```{r setup, message = FALSE, warning = FALSE}
+```{r setup, eval = FALSE, message = FALSE, warning = FALSE}
 devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
+```
+
+```{r pkg, message = FALSE, warning = FALSE}
 library(mcQTL)
 library(ggplot2)
 library(reshape2)
