@@ -22,6 +22,7 @@ TCA_deconv <- function(se){
                       refit_W = FALSE,
                       verbose = FALSE)
   res_full <- TCA::tensor(tca.mdl = res_tca, X = as.matrix(assay(se)))
+  names(res_full) <- colnames(se@metadata$prop)
   se@metadata$TCA_deconv <- res_full
   return(se)
 }
