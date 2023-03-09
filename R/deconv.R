@@ -4,7 +4,7 @@
 #'
 #' This is a function developed to implement cell-type proportion deconvolution using either `CIBERSORT` or `nnls`.
 #'
-#' @param se A `SummarizedExperiment` object with bulk protein/gene expression data frame contained in `counts` slot, and
+#' @param se A `SummarizedExperiment` object with bulk protein expression data frame contained in `counts` slot, and
 #' a "signature matrix" which serves as a reference of known cellular signatures contained as an element (`sig_matrix`) in `metadata` slot.
 #' @param method A character string denotes which deconvolution method to use. In this current version, only `CIBERSORT` or `nnls` is supported.
 #' @param TCA_update A logical value indicating whether to use TCA model to re-estimate the cell composition from last step.

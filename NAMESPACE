@@ -2,10 +2,12 @@
 
 export(CIBERSORT)
 export(TCA_deconv)
+export(cross_prop)
 export(csQTL)
 export(deconv)
 export(feature_filter)
 import(SummarizedExperiment)
+import(TCA)
 import(TOAST)
 import(e1071)
 import(parallel)

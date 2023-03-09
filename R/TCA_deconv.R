@@ -2,14 +2,14 @@
 #'
 #' This function returns a `SummarizedExperiment` object including deconvoluted cellular sample-wise expression.
 #'
-#' This is a function developed to implement deconvolution for cell-type-specific gene expression per bulk sample using `TCA`.
+#' This is a function developed to implement deconvolution for cell-type-specific expression per bulk sample using `TCA`.
 #'
-#' @param se A `SummarizedExperiment` object with bulk protein/gene expression data frame contained in `counts` slot, and
+#' @param se A `SummarizedExperiment` object with bulk protein expression data frame contained in `counts` slot, and
 #' cell-type proportion estimates for each sample contained as an element (`prop`) in `metadata` slot.
 #'
 #' @return A `SummarizedExperiment`. The results after `TCA` deconvolution will be stored as an element (`TCA_deconv`) in `metadata` slot.
 #' It is a list with the length of the number of cell types (as in `prop` in `metadata` slot).
-#' Each element stores the deconvoluted protein/gene expression matrix per bulk sample within that cell type.
+#' Each element stores the deconvoluted protein expression matrix per bulk sample within that cell type.
 #'
 #' @import SummarizedExperiment
 #'

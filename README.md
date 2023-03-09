@@ -1,42 +1,14 @@
 mcQTL: Multi-omic and Cell-type-specific Quantitative Trait Loci
 ================
 Yue Pan
-27 February, 2023
+09 March, 2023
 
-# Overview
-
-mcQTL (Multi-omic and Cell-type-specific Quantitative Trait Loci) is a
-tool that estimates cell type proportions in bulk proteomes by either
-using single data source reference or borrowing information in matched
-transcriptomes. Based on the deconvoluted cellular composition, mcQTL
-further performs Quantitative Trait Loci mapping at cellular resolution,
-as well as integrates and visualizes multi-source profiles at bulk and
-cell type levels.
-
-# Installation
-
-mcQTL depends on the following packages:
-
-*[SummarizedExperiment](https://bioconductor.org/packages/3.15/SummarizedExperiment)*,
-for data manipulation,
-
-*[BiocParallel](https://bioconductor.org/packages/3.15/BiocParallel)*,
-for parallel computing implementation,
-
-*[TOAST](https://bioconductor.org/packages/3.15/TOAST)*, for parallel
-computing implementation.
-
-Please install from github repository “YuePan027/mcQTL” under “dev”
-branch.
+# Install
 
 ``` r
-devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
-```
-
-``` r
+#devtools::install_github("YuePan027/mcQTL@dev") # from dev branch
 library(mcQTL)
 library(ggplot2)
-library(reshape2)
 ```
 
 # Quick start
@@ -229,7 +201,7 @@ system.time(se <- csQTL(se))
 #> csQTL test for protein Protein_261 
 #> csQTL test for protein Protein_283
 #>    user  system elapsed 
-#>    3.39    1.03  454.66
+#>    3.34    1.22  470.91
 ```
 
 We can check the results from csQTL analysis for the first target
@@ -246,6 +218,81 @@ head(se@metadata$TOAST_output[[1]])
 #> 6 Protein_5 9:105510462  0.3154370  0.2156796  0.3124176 0.01278241
 ```
 
+## Cross-source cell-type proportion deconvolution (optional)
+
+Besides cell-type proportion deconvolution using single source as shown
+above, we can also consider cross-source cell-type proportion
+deconvolution if we have matched samples from a different source. In the
+example below, we show how to estimate cell-type proportion from protein
+data by using an initial proportion estimated from gene expression. To
+explain the idea, we use randomly selected proteins as marker proteins.
+But in practice, more meaningful proteins should be included.
+
+``` r
+prop_gene <- mcQTL::prop_gene
+set.seed(1234)
+in_example <- sample(1:nrow(mcQTL::protein_data), size=500, replace =F)
+example_mrk <- rownames(mcQTL::protein_data)[in_example]
+se <- cross_prop(se, ini_prop = prop_gene, mrk_prot = example_mrk)
+#> INFO [2023-03-09 14:14:58] Starting tca...
+#> INFO [2023-03-09 14:14:58] Validating input...
+#> INFO [2023-03-09 14:14:58] Starting re-estimation of W...
+#> INFO [2023-03-09 14:14:58] Performing feature selection using refactor...
+#> INFO [2023-03-09 14:14:58] Starting refactor...
+#> INFO [2023-03-09 14:14:58] Running PCA on X using rand_svd == TRUE...
+#> INFO [2023-03-09 14:14:58] Computing a low rank approximation of X...
+#> INFO [2023-03-09 14:14:58] Calculating the distance of each feature from its low rank approximation...
+#> INFO [2023-03-09 14:14:58] Computing the ReFACTor components based on the top 500 features with lowest distances...
+#> INFO [2023-03-09 14:14:58] Finished refactor.
+#> INFO [2023-03-09 14:14:58] Fitting the TCA model using the selected features for re-estimating W...
+#> INFO [2023-03-09 14:14:58] Iteration 1 out of 10 external iterations (fitting all parameters including W)...
+#> INFO [2023-03-09 14:14:58] Fitting means and variances...
+#> INFO [2023-03-09 14:14:58] Iteration 1 out of 10 internal iterations...
+#> INFO [2023-03-09 14:14:58] Iteration 2 out of 10 internal iterations...
+#> INFO [2023-03-09 14:14:58] Iteration 3 out of 10 internal iterations...
+#> INFO [2023-03-09 14:14:59] Internal loop converged.
+#> INFO [2023-03-09 14:14:59] Fitting W...
+#> INFO [2023-03-09 14:15:00] Iteration 2 out of 10 external iterations (fitting all parameters including W)...
+#> INFO [2023-03-09 14:15:00] Fitting means and variances...
+#> INFO [2023-03-09 14:15:00] Iteration 1 out of 10 internal iterations...
+#> INFO [2023-03-09 14:15:00] Iteration 2 out of 10 internal iterations...
+#> INFO [2023-03-09 14:15:00] Internal loop converged.
+#> INFO [2023-03-09 14:15:00] Fitting W...
+#> INFO [2023-03-09 14:15:01] Iteration 3 out of 10 external iterations (fitting all parameters including W)...
+#> INFO [2023-03-09 14:15:01] Fitting means and variances...
+#> INFO [2023-03-09 14:15:01] Iteration 1 out of 10 internal iterations...
+#> INFO [2023-03-09 14:15:01] Iteration 2 out of 10 internal iterations...
+#> INFO [2023-03-09 14:15:01] Internal loop converged.
+#> INFO [2023-03-09 14:15:01] Fitting W...
+#> INFO [2023-03-09 14:15:03] Iteration 4 out of 10 external iterations (fitting all parameters including W)...
+#> INFO [2023-03-09 14:15:03] Fitting means and variances...
+#> INFO [2023-03-09 14:15:03] Iteration 1 out of 10 internal iterations...
+#> INFO [2023-03-09 14:15:03] Iteration 2 out of 10 internal iterations...
+#> INFO [2023-03-09 14:15:03] Internal loop converged.
+#> INFO [2023-03-09 14:15:03] Fitting W...
+#> INFO [2023-03-09 14:15:04] External loop converged.
+#> INFO [2023-03-09 14:15:04] Calculate p-values for deltas and gammas.
+#> INFO [2023-03-09 14:15:04] Fitting the TCA model given the updated W...
+#> INFO [2023-03-09 14:15:04] Fitting means and variances...
+#> INFO [2023-03-09 14:15:05] Iteration 1 out of 10 internal iterations...
+#> INFO [2023-03-09 14:15:05] Iteration 2 out of 10 internal iterations...
+#> INFO [2023-03-09 14:15:05] Internal loop converged.
+#> INFO [2023-03-09 14:15:05] Calculate p-values for deltas and gammas.
+#> INFO [2023-03-09 14:15:05] Finished tca.
+
+ggplot(data.frame(reshape2::melt(se@metadata$cross_prop)), 
+       aes(x = Var2, y = value, fill = Var2)) +
+  geom_point(position = position_jitterdodge(jitter.width = 0.1,
+                                           dodge.width = 0.7),
+           aes(fill = Var2, color = Var2),
+           pch = 21, alpha = 0.5) +
+  geom_boxplot(lwd=0.7, outlier.shape = NA) +
+  theme_classic() +
+  xlab("Cell type") + ylab("Estimated proportion")
+```
+
+![](README_files/figure-gfm/cross-1.png)<!-- -->
+
 ## TCA deconvolution (optional)
 
 The cell-type-specific gene expression per bulk sample can also be
@@ -260,11 +307,11 @@ first 5 samples):
 
 ``` r
 se <- TCA_deconv(se)
-#> INFO [2023-02-27 16:04:57] Validating input...
-#> INFO [2023-02-27 16:04:57] Starting tensor for estimating Z...
-#> INFO [2023-02-27 16:04:57] Estimate tensor...
-#> INFO [2023-02-27 16:04:59] Finished estimating tensor.
-se@metadata$TCA_deconv[[1]][1:5,1:5]
+#> INFO [2023-03-09 14:15:10] Validating input...
+#> INFO [2023-03-09 14:15:10] Starting tensor for estimating Z...
+#> INFO [2023-03-09 14:15:10] Estimate tensor...
+#> INFO [2023-03-09 14:15:13] Finished estimating tensor.
+se@metadata$TCA_deconv[["CellType_1"]][1:5,1:5]
 #>           Sample_1 Sample_2 Sample_3 Sample_4 Sample_5
 #> Protein_1 15.76586 16.08454 15.82306 15.76538 15.63249
 #> Protein_2 16.34240 16.34232 16.34242 16.34250 16.34245

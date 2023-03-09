@@ -7,7 +7,7 @@
 csQTL(se, BPPARAM = bpparam())
 }
 \arguments{
-\item{se}{A `SummarizedExperiment` object with bulk protein/gene expression data frame contained in `counts` slot.
+\item{se}{A `SummarizedExperiment` object with bulk protein expression data frame contained in `counts` slot.
 The information from genetic variants should be stored in a P (the number of SNP) by N (the number of samples, should match the sample in `counts` slot) matrix contained as an element (`SNP_data`) in `metadata` slot.
 Each matrix entry corresponds to the genotype group indicator (0, 1 or 2) for a sample at a genetic location.
 The annotations of these SNP should be stored as an element (`anno_SNP`) in `metadata` slot.

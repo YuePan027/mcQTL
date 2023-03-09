@@ -121,12 +121,36 @@ We can check the results from csQTL analysis for the first target protein by cal
 head(se@metadata$TOAST_output[[1]])
 ```
 
+
+## Cross-source cell-type proportion deconvolution (optional)
+
+Besides cell-type proportion deconvolution using single source as shown above, we can also consider cross-source cell-type proportion deconvolution if we have matched samples from a different source. In the example below, we show how to estimate cell-type proportion from protein data by using an initial proportion estimated from gene expression. To explain the idea, we use randomly selected proteins as marker proteins. But in practice, more meaningful proteins should be included.
+
+```{r cross}
+prop_gene <- mcQTL::prop_gene
+set.seed(1234)
+in_example <- sample(1:nrow(mcQTL::protein_data), size=500, replace =F)
+example_mrk <- rownames(mcQTL::protein_data)[in_example]
+se <- cross_prop(se, ini_prop = prop_gene, mrk_prot = example_mrk)
+
+ggplot(data.frame(reshape2::melt(se@metadata$cross_prop)), 
+       aes(x = Var2, y = value, fill = Var2)) +
+  geom_point(position = position_jitterdodge(jitter.width = 0.1,
+                                           dodge.width = 0.7),
+           aes(fill = Var2, color = Var2),
+           pch = 21, alpha = 0.5) +
+  geom_boxplot(lwd=0.7, outlier.shape = NA) +
+  theme_classic() +
+  xlab("Cell type") + ylab("Estimated proportion")
+```
+
+
 ## TCA deconvolution (optional)
 
 The cell-type-specific gene expression per bulk sample can also be estimated using `TCA` deconvolution method given cellular composition (stored in `prop` in `metadata` slot). The output will be stored as an element (`TCA_deconv`) in `metadata` slot. It is a list with the length of the number of cell types (same as cell types in `prop` in `metadata` slot). Each element stores a deconvoluted protein expression per bulk sample. Below is an example to check the deconvoluted cellular expression for the first cell type (restricted to first 5 proteins and first 5 samples):
 
 ```{r tca}
 se <- TCA_deconv(se)
-se@metadata$TCA_deconv[[1]][1:5,1:5]
+se@metadata$TCA_deconv[["CellType_1"]][1:5,1:5]
 ```
 
